@@ -1,0 +1,80 @@
+//
+//  ApiManager.swift
+//  YandexDiskRelease
+//
+//  Created by MacPro on 20.07.2022.
+//
+
+import Foundation
+import UIKit
+
+class ApiManager {
+    
+    static let shared = ApiManager()
+    
+    private init () {}
+    
+    var token: String! {
+        return (UserDefaults.standard.value(forKey: "Token") as? String) ?? nil
+    }
+        
+    func fetchFiles(completion: @escaping (DiskResponse) -> Void) {
+        
+        var components = URLComponents(string: "https://cloud-api.yandex.net/v1/disk/resources/last-uploaded")
+        components?.queryItems = [URLQueryItem(name: "media_type", value: "image")]
+        
+        guard let url = components?.url, (token != nil) else { return }
+        
+        var request = URLRequest(url: url)
+        request.setValue("OAuth \(token!)", forHTTPHeaderField: "Authorization")
+        
+        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            guard let data = data else { return }
+            guard let newFiles = try? JSONDecoder().decode(DiskResponse.self, from: data) else { return }
+            
+            guard newFiles.items != nil else {
+                print("items == nil")
+                return
+            }
+            
+            print("ПОЛУЧИЛИ \(newFiles.items?.count ?? 0) ОБЬЕКТОВ")
+            
+            DispatchQueue.main.async {
+                completion(newFiles)
+            }
+        }
+        task.resume()
+    }
+    
+    func loadImage(url: String, completion: @escaping ((UIImage?) -> Void)) {
+        guard let url = URL(string: url) else { return }
+        var request = URLRequest(url: url)
+        request.setValue("OAuth \(token!)", forHTTPHeaderField: "Authorization")
+        
+        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            guard let data = data else { return }
+            DispatchQueue.main.async {
+                completion(UIImage(data: data))
+            }
+        }
+        task.resume()
+    }
+    
+    func presentAuthViewController(navigationController: UINavigationController) {
+        let requsetTokenViewController = AuthViewController()
+        requsetTokenViewController.delegate = self
+        requsetTokenViewController.modalPresentationStyle = .fullScreen
+        navigationController.present(requsetTokenViewController, animated: false, completion: nil)
+        return
+    }
+}
+
+extension ApiManager: AuthViewControllerDelegate {
+    func handleTokenChanged(token: String) {
+        print("получили токен в методе делегата")
+        //self.token = token
+        //updateData()
+        
+        //здесь нужно уведомить зависимый vc о том что мы получили токен и можно снова делать запрос
+    }
+}

@@ -9,7 +9,7 @@ import Foundation
 import WebKit
 
 protocol AuthViewControllerDelegate: class {
-    func handleTokenChanged(token: String)
+    func handleTokenChanged()
 }
 
 final class AuthViewController: UIViewController {
@@ -68,7 +68,7 @@ extension AuthViewController: WKNavigationDelegate {
             
             if let token = token {
                 UserDefaults.standard.set(token, forKey: "Token")
-                delegate?.handleTokenChanged(token: token)
+                delegate?.handleTokenChanged()
             }
             dismiss(animated: true, completion: nil)
         }

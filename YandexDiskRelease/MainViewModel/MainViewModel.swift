@@ -7,24 +7,23 @@
 
 import Foundation
 
-protocol viewModelProtocol {
+protocol ViewModelProtocol {
     
     var files: [File] { get set }
-    var filesDidChangedHandler: (([File]) -> Void)? { get set }
+    var filesDidChangedHandler: (() -> Void)? { get set }
     
     func prepareFiles()
-    func printt()
 }
 
-class MainViewModel: viewModelProtocol {
+class MainViewModel: ViewModelProtocol {
     
-    var filesDidChangedHandler: (([File]) -> Void)?
+    var filesDidChangedHandler: (() -> Void)?
     
     var files: [File] = [] {
         didSet {
             print("files did set", files.count)
             
-            filesDidChangedHandler?(files)
+            filesDidChangedHandler?()
         }
     }
     
@@ -35,21 +34,8 @@ class MainViewModel: viewModelProtocol {
                 ApiManager.shared.loadImage(url: item.preview!) { (image) in
                     let file = File(image: image!, name: item.name!, size: String(item.size!))
                     self.files.append(file)
-                    //self.applySnapshot()
                 }
             }
         }
     }
-    
-    func printt() {
-        print("print print print")
-    }
-    
-    //массив файлов
-    
-    //функ запроса к апи на массив файлов
-    
-    //diskResponse to File
-    
-    
 }

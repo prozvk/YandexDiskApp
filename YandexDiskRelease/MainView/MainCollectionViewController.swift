@@ -19,21 +19,9 @@ class MainCollectionViewController: UICollectionViewController {
     
     //var files: [File] = []
     
-    var viewModel: viewModelProtocol! {
-        didSet {
-            print(2)
-            viewModel.filesDidChangedHandler = { [weak self] files in
-                print("in handler", files.count)
-                //self?.files = files
-                self?.applySnapshot()
-            }
-        }
-    }
+    var viewModel: ViewModelProtocol!
         
-    init(viewModel: viewModelProtocol = DIContainer.shared.resolve(type: MainViewModel.self)) {
-        self.viewModel = viewModel
-        print(1)
-
+    init(viewModel: ViewModelProtocol = DIContainer.shared.resolve(type: MainViewModel.self)) {
         let layout = UICollectionViewCompositionalLayout { (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
             let item = NSCollectionLayoutItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5), heightDimension: .fractionalHeight(1.0)))
             item.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 5, bottom: 5, trailing: 5)
@@ -56,12 +44,11 @@ class MainCollectionViewController: UICollectionViewController {
         
         super.init(collectionViewLayout: layout)
         
-        self.viewModel.filesDidChangedHandler = { [weak self] files in
-            print("in handler", files.count)
-            //self?.files = files
+        self.viewModel = viewModel
+        
+        self.viewModel.filesDidChangedHandler = { [weak self] in
             self?.applySnapshot()
         }
-        
     }
     
     required init?(coder: NSCoder) {
@@ -82,6 +69,8 @@ class MainCollectionViewController: UICollectionViewController {
     }
     
     func prepareFiles() {
+        viewModel?.prepareFiles()
+        
 //        ApiManager.shared.fetchFiles { (response) in
 //            guard let items = response.items else { return }
 //            for item in items {
@@ -92,8 +81,6 @@ class MainCollectionViewController: UICollectionViewController {
 //                }
 //            }
 //        }
-        
-        viewModel?.prepareFiles()
     }
     
     func setupNavigatioBar() {
@@ -125,7 +112,7 @@ class MainCollectionViewController: UICollectionViewController {
 
 extension MainCollectionViewController: AuthViewControllerDelegate {
     
-    func handleTokenChanged(token: String) {
+    func handleTokenChanged() {
         prepareFiles()
     }
     

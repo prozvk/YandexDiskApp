@@ -59,22 +59,4 @@ class ApiManager {
         }
         task.resume()
     }
-    
-    func presentAuthViewController(navigationController: UINavigationController) {
-        let requsetTokenViewController = AuthViewController()
-        requsetTokenViewController.delegate = self
-        requsetTokenViewController.modalPresentationStyle = .fullScreen
-        navigationController.present(requsetTokenViewController, animated: false, completion: nil)
-        return
-    }
-}
-
-extension ApiManager: AuthViewControllerDelegate {
-    func handleTokenChanged(token: String) {
-        print("получили токен в методе делегата")
-        //self.token = token
-        //updateData()
-        
-        //здесь нужно уведомить зависимый vc о том что мы получили токен и можно снова делать запрос
-    }
 }

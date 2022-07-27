@@ -11,14 +11,14 @@ import UIKit
 class MainCollectionViewController: UICollectionViewController {
     
     static let sectionHeaderElementKind = "section-header-element-kind"
+    static let sectionFooterElementKind = "section-footer-element-kind"
     
-    typealias DataSource = UICollectionViewDiffableDataSource<Int, File>
+    private typealias DataSource = UICollectionViewDiffableDataSource<Int, File>
     private typealias Snapshot = NSDiffableDataSourceSnapshot<Int, File>
     
     private lazy var dataSource = makeDataSource()
     
-    //var files: [File] = []
-    
+    var footerView: FooterSupplementaryView?
     var viewModel: ViewModelProtocol!
         
     init(viewModel: ViewModelProtocol = DIContainer.shared.resolve(type: MainViewModel.self)) {
@@ -31,13 +31,17 @@ class MainCollectionViewController: UICollectionViewController {
             let section = NSCollectionLayoutSection(group: group)
             section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 20, trailing: 0)
             
-            let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+            let headerFooterSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
                                                          heightDimension: .estimated(44))
-            let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize,
+            let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerFooterSize,
                                                                             elementKind: MainCollectionViewController.sectionHeaderElementKind,
                                                                             alignment: .top)
+            
+            let sectionFooter = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerFooterSize,
+                                                                            elementKind: MainCollectionViewController.sectionFooterElementKind,
+                                                                            alignment: .bottom)
  
-            section.boundarySupplementaryItems = [sectionHeader]
+            section.boundarySupplementaryItems = [sectionHeader, sectionFooter]
             
             return section
         }
@@ -48,6 +52,8 @@ class MainCollectionViewController: UICollectionViewController {
         
         self.viewModel.filesDidChangedHandler = { [weak self] in
             self?.applySnapshot()
+            self?.footerView?.activityIndicator.stopAnimating()
+            self?.footerView?.photosNumberLabel.isHidden = false
         }
     }
     
@@ -70,17 +76,6 @@ class MainCollectionViewController: UICollectionViewController {
     
     func prepareFiles() {
         viewModel?.prepareFiles()
-        
-//        ApiManager.shared.fetchFiles { (response) in
-//            guard let items = response.items else { return }
-//            for item in items {
-//                ApiManager.shared.loadImage(url: item.preview!) { (image) in
-//                    let file = File(image: image!, name: item.name!, size: String(item.size!))
-//                    self.files.append(file)
-//                    self.applySnapshot()
-//                }
-//            }
-//        }
     }
     
     func setupNavigatioBar() {
@@ -108,22 +103,39 @@ class MainCollectionViewController: UICollectionViewController {
 //        navigationItem.titleView = leftButton
     }
     
+    override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let height = scrollView.contentSize.height
+
+        print("scrollView.contentOffset.y", offsetY)
+        print("scrollView.contentSize.height", height)
+        print("scrollView.frame.size.height", scrollView.frame.size.height, "\n\n\n")
+
+        if offsetY + 300 > height - scrollView.frame.size.height {
+            print("CALL API")
+
+            footerView?.photosNumberLabel.isHidden = true
+            footerView?.activityIndicator.startAnimating()
+
+            prepareFiles()
+        }
+    }
 }
 
-extension MainCollectionViewController: AuthViewControllerDelegate {
-    
-    func handleTokenChanged() {
-        prepareFiles()
-    }
-    
-    func presentAuthViewController() {
-        let requsetTokenViewController = AuthViewController()
-        requsetTokenViewController.delegate = self
-        requsetTokenViewController.modalPresentationStyle = .fullScreen
-        navigationController?.present(requsetTokenViewController, animated: false, completion: nil)
-        return
-    }
-}
+//extension MainCollectionViewController: AuthViewControllerDelegate {
+//    
+//    func handleTokenChanged() {
+//        prepareFiles()
+//    }
+//    
+//    func presentAuthViewController() {
+//        let requsetTokenViewController = AuthViewController()
+//        requsetTokenViewController.delegate = self
+//        requsetTokenViewController.modalPresentationStyle = .fullScreen
+//        navigationController?.present(requsetTokenViewController, animated: false, completion: nil)
+//        return
+//    }
+//}
 
 //Пока что cell layout здесь:
 
@@ -131,22 +143,42 @@ extension MainCollectionViewController: AuthViewControllerDelegate {
 
 extension MainCollectionViewController {
     
-    func makeDataSource() -> DataSource {
+    private func makeDataSource() -> DataSource {
         
         let dataSource = DataSource(collectionView: collectionView) { (collectionView, indexPath, file) -> UICollectionViewCell? in
             
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "reuseId", for: indexPath) as! MainCollectionViewCell
             cell.nameLabel.text = file.name
-            cell.imageView.image = file.image
+            guard let image = file.image else { return cell }
+            
+            cell.imageView.image = image
+            cell.imageView.contentMode = .scaleAspectFill
             return cell
         }
         
         let headerRegistration = UICollectionView.SupplementaryRegistration<TitleSupplementaryView> (elementKind: MainCollectionViewController.sectionHeaderElementKind) { (supplementaryView, elementKind, indexPath) in
+            
             supplementaryView.sectionName.text = "Изображения"
         }
         
+        let footerRegistration = UICollectionView.SupplementaryRegistration<FooterSupplementaryView> (elementKind: MainCollectionViewController.sectionFooterElementKind) {
+            (footerSupplementaryView, elementKind, indexPath) in
+            
+            //MARK: - TODO: text = viewModel.правильное описание количества фоток на русском языке()
+            
+            self.footerView = footerSupplementaryView
+            footerSupplementaryView.photosNumberLabel.text = "\(self.viewModel.files.count) файла(-ов)"
+        }
+        
         dataSource.supplementaryViewProvider = { (supplementaryView, elementKind, indexPath) in
-            return self.collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
+            switch elementKind {
+            case MainCollectionViewController.sectionHeaderElementKind:
+                return self.collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
+            case MainCollectionViewController.sectionFooterElementKind:
+                return self.collectionView.dequeueConfiguredReusableSupplementary(using: footerRegistration, for: indexPath)
+            default:
+                return self.collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
+            }
         }
         
         return dataSource

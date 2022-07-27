@@ -11,7 +11,7 @@ import UIKit
 struct File: Hashable {
     
     var id = UUID()
-    var image: UIImage
+    var image: UIImage?
     var name: String
     var size: String
 }

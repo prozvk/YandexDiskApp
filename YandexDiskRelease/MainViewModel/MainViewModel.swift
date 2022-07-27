@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 protocol ViewModelProtocol {
     
@@ -13,29 +14,60 @@ protocol ViewModelProtocol {
     var filesDidChangedHandler: (() -> Void)? { get set }
     
     func prepareFiles()
+    
+    func presentAuthViewController()
 }
 
 class MainViewModel: ViewModelProtocol {
     
+    var navigationController: UINavigationController?
+    
+    init(navController: UINavigationController) {
+        self.navigationController = navController
+    }
+    
     var filesDidChangedHandler: (() -> Void)?
     
     var files: [File] = [] {
-        didSet {
-            print("files did set", files.count)
-            
+        didSet {            
             filesDidChangedHandler?()
         }
     }
     
+    var offset: Int {
+        return files.count
+    }
+    
     func prepareFiles() {
-        ApiManager.shared.fetchFiles { (response) in
+        ApiManager.shared.fetchFiles(offset: offset) { (response) in
             guard let items = response.items else { return }
             for item in items {
-                ApiManager.shared.loadImage(url: item.preview!) { (image) in
-                    let file = File(image: image!, name: item.name!, size: String(item.size!))
+                if let preview = item.preview {
+                    ApiManager.shared.loadImage(url: preview) { (image) in
+                        let file = File(image: image, name: item.name!, size: String(item.size!))
+                        self.files.append(file)
+                    }
+                } else {
+                    let file = File(image: nil, name: item.name!, size: String(item.size!))
                     self.files.append(file)
                 }
             }
         }
+    }
+}
+
+extension MainViewModel: AuthViewControllerDelegate {
+    
+    func handleTokenChanged() {
+        prepareFiles()
+    }
+    
+    func presentAuthViewController() {
+        let requsetTokenViewController = AuthViewController()
+        requsetTokenViewController.delegate = self
+        requsetTokenViewController.modalPresentationStyle = .fullScreen
+        navigationController?.present(requsetTokenViewController, animated: false, completion: nil)
+        //navigationController?.present(requsetTokenViewController, animated: false, completion: nil)
+        return
     }
 }

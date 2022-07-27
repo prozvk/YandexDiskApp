@@ -12,10 +12,12 @@ class MainCollectionViewCell: UICollectionViewCell {
     lazy var imageView: UIImageView = {
         let image = UIImageView()
         image.translatesAutoresizingMaskIntoConstraints = false
-        image.image = UIImage(named: "image")
-        image.contentMode = .scaleAspectFill
+        image.image = UIImage(systemName: "doc.text")
+        image.tintColor = #colorLiteral(red: 0.4861351612, green: 0.4896013709, blue: 0.5, alpha: 1)
+        image.backgroundColor = .systemGroupedBackground
+        //image.contentMode = .scaleAspectFill
+        image.contentMode = .center
         image.layer.cornerRadius = 25
-        image.backgroundColor = .systemBlue
         image.layer.masksToBounds = true
         image.clipsToBounds = true
         return image

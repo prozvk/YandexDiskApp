@@ -12,16 +12,18 @@ class ApiManager {
     
     static let shared = ApiManager()
     
-    private init () {}
+    private init() {}
     
     var token: String! {
         return (UserDefaults.standard.value(forKey: "Token") as? String) ?? nil
     }
         
-    func fetchFiles(completion: @escaping (DiskResponse) -> Void) {
+    func fetchFiles(offset: Int, completion: @escaping (DiskResponse) -> Void) {
         
-        var components = URLComponents(string: "https://cloud-api.yandex.net/v1/disk/resources/last-uploaded")
-        components?.queryItems = [URLQueryItem(name: "media_type", value: "image")]
+        var components = URLComponents(string: "https://cloud-api.yandex.net/v1/disk/resources/files")
+        //components?.queryItems = [URLQueryItem(name: "media_type", value: "image")]
+        
+        components?.queryItems = [URLQueryItem(name: "limit", value: "10"), URLQueryItem(name: "offset", value: "\(offset)")]
         
         guard let url = components?.url, (token != nil) else { return }
         

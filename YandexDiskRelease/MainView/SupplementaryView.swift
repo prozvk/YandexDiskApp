@@ -18,13 +18,15 @@ class TitleSupplementaryView: UICollectionReusableView {
         label.font = UIFont(name: "Montserrat-Bold", size: 22)
         return label
     }()
+    
     let allButton: UIButton = {
         let button = UIButton()
         button.setTitle("См. все", for: .normal)
-        button.titleLabel?.font = UIFont(name: "Montserrat-Light", size: 18)
-        button.setTitleColor(.black, for: .normal)
+        button.titleLabel?.font = UIFont(name: "Montserrat-Bold", size: 15)
+        button.setTitleColor(.systemBlue, for: .normal)
         button.setTitleColor(#colorLiteral(red: 0.6755829632, green: 0.6755829632, blue: 0.6755829632, alpha: 1), for: .highlighted)
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.sizeToFit()
         return button
     }()
 
@@ -46,12 +48,11 @@ extension TitleSupplementaryView {
 
         let inset = CGFloat(10)
         NSLayoutConstraint.activate([
-            allButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -inset),
+            allButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -inset * 2),
             allButton.topAnchor.constraint(equalTo: topAnchor, constant: inset),
             allButton.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -inset),
-            allButton.widthAnchor.constraint(equalToConstant: 100),
             
-            sectionName.leadingAnchor.constraint(equalTo: leadingAnchor, constant: inset),
+            sectionName.leadingAnchor.constraint(equalTo: leadingAnchor, constant: inset * 2),
             sectionName.trailingAnchor.constraint(equalTo: allButton.leadingAnchor, constant: -inset),
             sectionName.topAnchor.constraint(equalTo: topAnchor, constant: inset),
             sectionName.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -inset)

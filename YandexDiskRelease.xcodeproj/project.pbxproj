@@ -20,6 +20,7 @@
 		B64991FD2889807D000BC40D /* Montserrat-VariableFont_wght.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B64991FC2889807D000BC40D /* Montserrat-VariableFont_wght.ttf */; };
 		B64992032889995E000BC40D /* Montserrat-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B64992022889995E000BC40D /* Montserrat-Bold.ttf */; };
 		B64992072889A18A000BC40D /* Montserrat-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B64992062889A18A000BC40D /* Montserrat-Light.ttf */; };
+		B6A87509288FCE38007CFBA1 /* FooterSupplementaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A87508288FCE38007CFBA1 /* FooterSupplementaryView.swift */; };
 		B6DFA69528882DC900B29201 /* ApiManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DFA69428882DC900B29201 /* ApiManager.swift */; };
 		B6E55490288AF2CA00314053 /* SupplementaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E5548F288AF2CA00314053 /* SupplementaryView.swift */; };
 		B6E55495288E716C00314053 /* DIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E55494288E716C00314053 /* DIContainer.swift */; };
@@ -42,6 +43,7 @@
 		B64991FC2889807D000BC40D /* Montserrat-VariableFont_wght.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Montserrat-VariableFont_wght.ttf"; sourceTree = "<group>"; };
 		B64992022889995E000BC40D /* Montserrat-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Montserrat-Bold.ttf"; path = "../../../../Downloads/montserrat/static/Montserrat-Bold.ttf"; sourceTree = "<group>"; };
 		B64992062889A18A000BC40D /* Montserrat-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Montserrat-Light.ttf"; sourceTree = "<group>"; };
+		B6A87508288FCE38007CFBA1 /* FooterSupplementaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FooterSupplementaryView.swift; sourceTree = "<group>"; };
 		B6DFA69428882DC900B29201 /* ApiManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiManager.swift; sourceTree = "<group>"; };
 		B6E5548F288AF2CA00314053 /* SupplementaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupplementaryView.swift; sourceTree = "<group>"; };
 		B6E55494288E716C00314053 /* DIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIContainer.swift; sourceTree = "<group>"; };
@@ -144,6 +146,7 @@
 				B648C2142887098D00F5B342 /* MainCollectionViewController.swift */,
 				B644C3C9288808E90007F6E2 /* MainCollectionViewCell.swift */,
 				B6E5548F288AF2CA00314053 /* SupplementaryView.swift */,
+				B6A87508288FCE38007CFBA1 /* FooterSupplementaryView.swift */,
 			);
 			path = MainView;
 			sourceTree = "<group>";
@@ -240,6 +243,7 @@
 				B648C2132887098D00F5B342 /* SceneDelegate.swift in Sources */,
 				B648C22928870F1B00F5B342 /* DiskResponse.swift in Sources */,
 				B64991F82888680C000BC40D /* MainViewModel.swift in Sources */,
+				B6A87509288FCE38007CFBA1 /* FooterSupplementaryView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

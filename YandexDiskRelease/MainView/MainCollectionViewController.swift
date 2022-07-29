@@ -20,6 +20,26 @@ class MainCollectionViewController: UICollectionViewController {
     
     var footerView: FooterSupplementaryView?
     var viewModel: ViewModelProtocol!
+
+
+    //MARK: - TODO перенести во viewModel
+    var isPaging = false
+    
+    var isUpdating: Bool = false {
+        didSet {
+            //print("did set is Updating", isUpdating)
+            if isUpdating {
+                footerView?.photosNumberLabel.isHidden = true
+                footerView?.activityIndicator.startAnimating()
+                footerView?.layoutIfNeeded()
+            } else {
+                footerView?.activityIndicator.stopAnimating()
+                footerView?.photosNumberLabel.text = "\(viewModel.files.count) файла(-ов)"
+                footerView?.photosNumberLabel.isHidden = false
+                footerView?.layoutIfNeeded()
+            }
+        }
+    }
         
     init(viewModel: ViewModelProtocol = DIContainer.shared.resolve(type: MainViewModel.self)) {
         let layout = UICollectionViewCompositionalLayout { (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
@@ -50,10 +70,13 @@ class MainCollectionViewController: UICollectionViewController {
         
         self.viewModel = viewModel
         
+        
         self.viewModel.filesDidChangedHandler = { [weak self] in
             self?.applySnapshot()
-            self?.footerView?.activityIndicator.stopAnimating()
-            self?.footerView?.photosNumberLabel.isHidden = false
+//            self?.footerView?.activityIndicator.stopAnimating()
+//            self?.footerView?.photosNumberLabel.isHidden = false
+            self?.isUpdating = false
+            self?.isPaging = false
         }
     }
     
@@ -69,13 +92,33 @@ class MainCollectionViewController: UICollectionViewController {
         collectionView.backgroundColor = .white
         collectionView.register(MainCollectionViewCell.self, forCellWithReuseIdentifier: "reuseId")
                 
+        collectionView.refreshControl = UIRefreshControl()
+        
         setupNavigatioBar()
+        
+        applySnapshot()
                             
         prepareFiles()
     }
     
     func prepareFiles() {
-        viewModel?.prepareFiles()
+        if !viewModel.isPaginating && !isUpdating && !isPaging {
+            isUpdating = true
+            isPaging = true
+            viewModel.isPaginating = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) { [self] in
+                print(viewModel.files.count)
+                viewModel.prepareFiles()
+            }
+        }
+        
+//        print(viewModel.files.count)
+//        if !viewModel.isPaginating && !isUpdating && !isPaging {
+//            isUpdating = true
+//            isPaging = true
+//            viewModel.prepareFiles()
+//        }
+        
     }
     
     func setupNavigatioBar() {
@@ -103,41 +146,46 @@ class MainCollectionViewController: UICollectionViewController {
 //        navigationItem.titleView = leftButton
     }
     
-    override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+//    override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+//        let offsetY = scrollView.contentOffset.y
+//        let height = scrollView.contentSize.height
+//
+////        print("scrollView.contentOffset.y", offsetY)
+////        print("scrollView.contentSize.height", height)
+////        print("scrollView.frame.size.height", scrollView.frame.size.height, "\n\n\n")
+//
+//        if offsetY + 300 > height - scrollView.frame.size.height {
+//            print("CALL API")
+//            isUpdating = true
+//
+//            prepareFiles()
+//        }
+//    }
+    
+    
+    // Вызывается при инерционном скроле, pull to refresh
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offsetY = scrollView.contentOffset.y
         let height = scrollView.contentSize.height
 
-        print("scrollView.contentOffset.y", offsetY)
-        print("scrollView.contentSize.height", height)
-        print("scrollView.frame.size.height", scrollView.frame.size.height, "\n\n\n")
+        if offsetY > height - scrollView.frame.size.height && !isPaging && height != 0 && !viewModel.isPaginating {
 
-        if offsetY + 300 > height - scrollView.frame.size.height {
-            print("CALL API")
-
-            footerView?.photosNumberLabel.isHidden = true
-            footerView?.activityIndicator.startAnimating()
-
+            print("\nPULL TO REFRESH")
             prepareFiles()
         }
     }
+    
+    
+    override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if indexPath.row == viewModel.files.count - 1 && viewModel.files.count != 0 {
+            print("viewModelFilesCount", viewModel.files.count)
+            if !isPaging && !viewModel.isPaginating && !isUpdating {
+                print("\nEND OF LIST => CALL API")
+                prepareFiles()
+            }
+        }
+    }
 }
-
-//extension MainCollectionViewController: AuthViewControllerDelegate {
-//    
-//    func handleTokenChanged() {
-//        prepareFiles()
-//    }
-//    
-//    func presentAuthViewController() {
-//        let requsetTokenViewController = AuthViewController()
-//        requsetTokenViewController.delegate = self
-//        requsetTokenViewController.modalPresentationStyle = .fullScreen
-//        navigationController?.present(requsetTokenViewController, animated: false, completion: nil)
-//        return
-//    }
-//}
-
-//Пока что cell layout здесь:
 
 // MARK: - DataSorce
 
@@ -148,11 +196,8 @@ extension MainCollectionViewController {
         let dataSource = DataSource(collectionView: collectionView) { (collectionView, indexPath, file) -> UICollectionViewCell? in
             
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "reuseId", for: indexPath) as! MainCollectionViewCell
-            cell.nameLabel.text = file.name
-            guard let image = file.image else { return cell }
+            cell.configureWithFile(file: file)
             
-            cell.imageView.image = image
-            cell.imageView.contentMode = .scaleAspectFill
             return cell
         }
         
@@ -192,7 +237,6 @@ extension MainCollectionViewController {
     func applySnapshot() {
         var snapshot = Snapshot()
         snapshot.appendSections([0])
-        //snapshot.appendItems(files, toSection: 0)
         snapshot.appendItems(viewModel.files, toSection: 0)
         dataSource.apply(snapshot, animatingDifferences: true)
     }

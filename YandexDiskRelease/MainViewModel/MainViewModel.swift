@@ -12,6 +12,7 @@ protocol ViewModelProtocol {
     
     var files: [File] { get set }
     var filesDidChangedHandler: (() -> Void)? { get set }
+    var isPaginating: Bool { get set }
     
     func prepareFiles()
     
@@ -34,13 +35,22 @@ class MainViewModel: ViewModelProtocol {
         }
     }
     
-    var offset: Int {
-        return files.count
-    }
+    
+//    var offset: Int {
+//        return files.count
+//    }
+    
+    var offset = 0
+    
+    var isPaginating = false
     
     func prepareFiles() {
+        isPaginating = true
         ApiManager.shared.fetchFiles(offset: offset) { (response) in
             guard let items = response.items else { return }
+            let startCount = self.files.count
+            print("START COUNT", self.files.count)
+            print("КОЛИЧЕСТВО ПРИШЕДШИХ items", items.count)
             for item in items {
                 if let preview = item.preview {
                     ApiManager.shared.loadImage(url: preview) { (image) in
@@ -52,6 +62,13 @@ class MainViewModel: ViewModelProtocol {
                     self.files.append(file)
                 }
             }
+            let newFiles = [File]()
+            self.files.append(contentsOf: newFiles)
+            print(self.files.count - startCount, "ФАЙЛОВ БЫЛО ДОБАВЛЕНО")
+            
+            self.offset += items.count
+            print("offset", self.offset)
+            self.isPaginating = false
         }
     }
 }
@@ -67,7 +84,6 @@ extension MainViewModel: AuthViewControllerDelegate {
         requsetTokenViewController.delegate = self
         requsetTokenViewController.modalPresentationStyle = .fullScreen
         navigationController?.present(requsetTokenViewController, animated: false, completion: nil)
-        //navigationController?.present(requsetTokenViewController, animated: false, completion: nil)
         return
     }
 }

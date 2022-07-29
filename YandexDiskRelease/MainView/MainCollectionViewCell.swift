@@ -15,8 +15,8 @@ class MainCollectionViewCell: UICollectionViewCell {
         image.image = UIImage(systemName: "doc.text")
         image.tintColor = #colorLiteral(red: 0.4861351612, green: 0.4896013709, blue: 0.5, alpha: 1)
         image.backgroundColor = .systemGroupedBackground
-        //image.contentMode = .scaleAspectFill
-        image.contentMode = .center
+        image.contentMode = .scaleAspectFill
+        //image.contentMode = .center
         image.layer.cornerRadius = 25
         image.layer.masksToBounds = true
         image.clipsToBounds = true
@@ -70,5 +70,32 @@ class MainCollectionViewCell: UICollectionViewCell {
             sizeLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 10)
             //sizeLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -inset)
             ])
+    }
+    
+    func configureWithFile(file: File) {
+        if file.image != nil {
+            imageView.image = file.image
+            nameLabel.text = file.name
+            imageView.contentMode = .scaleAspectFill
+        } else {
+            imageView.contentMode = .center
+            imageView.image = UIImage(systemName: "doc.text")
+            nameLabel.text = file.name
+        }
+        
+//        if file.imageUrl != nil {
+//            ApiManager.shared.loadImage(url: file.imageUrl!, completion: { (image) in
+//                self.imageView.image = image
+//                self.layoutIfNeeded()
+//                self.layoutSubviews()
+//            })
+//            nameLabel.text = file.name
+//            imageView.contentMode = .scaleAspectFill
+//        } else {
+//            imageView.contentMode = .center
+//            imageView.image = UIImage(systemName: "doc.text")
+//            nameLabel.text = file.name
+//        }
+        
     }
 }

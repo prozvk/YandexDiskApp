@@ -39,7 +39,7 @@ class ApiManager {
                 return
             }
             
-            print("ПОЛУЧИЛИ \(newFiles.items?.count ?? 0) ОБЬЕКТОВ")
+            //print("ПОЛУЧИЛИ \(newFiles.items?.count ?? 0) ОБЬЕКТОВ")
             
             DispatchQueue.main.async {
                 completion(newFiles)

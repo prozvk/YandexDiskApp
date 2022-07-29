@@ -129,6 +129,7 @@ class MainCollectionViewController: UICollectionViewController {
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.barTintColor = .white
         
+        
 //        let leftButton = UIButton()
 //        leftButton.setImage(UIImage(systemName: "chevron.left", withConfiguration: nil), for: .normal)
 //        leftButton.setTitle("кнопка", for: .normal)

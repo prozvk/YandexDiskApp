@@ -17,4 +17,11 @@ struct DiskFile: Codable {
     let size: Int64?
     let type: String?
     let mime_type: String?
+    let path: String
+}
+
+struct UrlResponse: Codable {
+    let href: String?
+    let method: String?
+    let templated: Bool?
 }

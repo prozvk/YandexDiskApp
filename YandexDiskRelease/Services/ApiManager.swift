@@ -23,7 +23,7 @@ class ApiManager {
         var components = URLComponents(string: "https://cloud-api.yandex.net/v1/disk/resources/files")
         //components?.queryItems = [URLQueryItem(name: "media_type", value: "image")]
         
-        components?.queryItems = [URLQueryItem(name: "limit", value: "10"), URLQueryItem(name: "offset", value: "\(offset)")]
+        components?.queryItems = [URLQueryItem(name: "limit", value: "20"), URLQueryItem(name: "offset", value: "\(offset)")]
         
         guard let url = components?.url, (token != nil) else { return }
         
@@ -38,9 +38,7 @@ class ApiManager {
                 print("items == nil")
                 return
             }
-            
-            //print("ПОЛУЧИЛИ \(newFiles.items?.count ?? 0) ОБЬЕКТОВ")
-            
+                        
             DispatchQueue.main.async {
                 completion(newFiles)
             }
@@ -48,15 +46,45 @@ class ApiManager {
         task.resume()
     }
     
-    func loadImage(url: String, completion: @escaping ((UIImage?) -> Void)) {
-        guard let url = URL(string: url) else { return }
+    func loadImage(url: URL, completion: @escaping ((UIImage?) -> Void)) {
         var request = URLRequest(url: url)
         request.setValue("OAuth \(token!)", forHTTPHeaderField: "Authorization")
         
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-            guard let data = data else { return }
+            guard let data = data, let image = UIImage(data: data) else {
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
+                return
+            }
             DispatchQueue.main.async {
-                completion(UIImage(data: data))
+                completion(image)
+            }
+        }
+        task.resume()
+    }
+    
+    func getUrlForDownloadingImage(path: String, completion: @escaping ((String?) -> Void)) {
+        
+        var components = URLComponents(string: "https://cloud-api.yandex.net/v1/disk/resources/download")
+        
+        components?.queryItems = [URLQueryItem(name: "path", value: path)]
+        
+        var request = URLRequest(url: components!.url!)
+        request.setValue("OAuth \(token!)", forHTTPHeaderField: "Authorization")
+        
+        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            
+            guard let data = data else { return }
+            guard let url = try? JSONDecoder().decode(UrlResponse.self, from: data) else { return }
+            
+            if error != nil {
+                print(error?.localizedDescription as Any)
+                fatalError()
+            }
+            
+            DispatchQueue.main.async {
+                completion(url.href)
             }
         }
         task.resume()

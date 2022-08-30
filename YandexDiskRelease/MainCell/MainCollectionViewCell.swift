@@ -7,7 +7,11 @@
 
 import UIKit
 
-class MainCollectionViewCell: UICollectionViewCell {
+protocol CollectionViewCellWithImageView {
+    var imageView: UIImageView { get }
+}
+
+class MainCollectionViewCell: UICollectionViewCell, CollectionViewCellWithImageView {
     
     lazy var imageView: UIImageView = {
         let image = UIImageView()
@@ -34,7 +38,6 @@ class MainCollectionViewCell: UICollectionViewCell {
     lazy var sizeLabel: UILabel = {
         let size = UILabel()
         size.font = UIFont(name: "Montserrat-Light", size: 15)
-        size.text = "25,6 mb"
         size.translatesAutoresizingMaskIntoConstraints = false
         return size
     }()
@@ -52,7 +55,6 @@ class MainCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(imageView)
         contentView.addSubview(nameLabel)
         contentView.addSubview(sizeLabel)
-        
         let inset = CGFloat(0)
         
         NSLayoutConstraint.activate([
@@ -72,30 +74,24 @@ class MainCollectionViewCell: UICollectionViewCell {
             ])
     }
     
-    func configureWithFile(file: File) {
+    func configure(file: File) {
+        nameLabel.text = file.name
+        sizeLabel.text = file.size
+        imageView.contentMode = .scaleAspectFill
         if file.image != nil {
             imageView.image = file.image
-            nameLabel.text = file.name
-            imageView.contentMode = .scaleAspectFill
+        } else if file.preview != nil {
+            imageView.image = file.preview
         } else {
             imageView.contentMode = .center
             imageView.image = UIImage(systemName: "doc.text")
-            nameLabel.text = file.name
         }
-        
-//        if file.imageUrl != nil {
-//            ApiManager.shared.loadImage(url: file.imageUrl!, completion: { (image) in
-//                self.imageView.image = image
-//                self.layoutIfNeeded()
-//                self.layoutSubviews()
-//            })
-//            nameLabel.text = file.name
-//            imageView.contentMode = .scaleAspectFill
-//        } else {
-//            imageView.contentMode = .center
-//            imageView.image = UIImage(systemName: "doc.text")
-//            nameLabel.text = file.name
-//        }
-        
+    }
+    
+    override func prepareForReuse() {
+        imageView.image = UIImage(systemName: "doc.text")
+        imageView.contentMode = .center
+        nameLabel.text = ""
+        sizeLabel.text = ""
     }
 }

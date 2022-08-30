@@ -20,9 +20,13 @@ class MainCollectionViewController: UICollectionViewController {
     
     var footerView: FooterSupplementaryView?
     var viewModel: ViewModelProtocol!
+    
+    let transitionDelegate = TransitionController.shared
+    
+    var selectedCellImageView: UIImageView!
+    var selectedCellImageRect: CGRect!
 
-
-    //MARK: - TODO перенести во viewModel
+    //MARK: - TODO: перенести во viewModel
     var isPaging = false
     
     var isUpdating: Bool = false {
@@ -41,43 +45,24 @@ class MainCollectionViewController: UICollectionViewController {
         }
     }
         
-    init(viewModel: ViewModelProtocol = DIContainer.shared.resolve(type: MainViewModel.self)) {
-        let layout = UICollectionViewCompositionalLayout { (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
-            let item = NSCollectionLayoutItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5), heightDimension: .fractionalHeight(1.0)))
-            item.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 5, bottom: 5, trailing: 5)
-            let groupSize = NSCollectionLayoutSize(widthDimension: NSCollectionLayoutDimension.fractionalWidth(1.0), heightDimension: NSCollectionLayoutDimension.fractionalWidth(0.65))
-            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitem: item, count: 2)
-            group.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5)
-            let section = NSCollectionLayoutSection(group: group)
-            section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 20, trailing: 0)
-            
-            let headerFooterSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                                         heightDimension: .estimated(44))
-            let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerFooterSize,
-                                                                            elementKind: MainCollectionViewController.sectionHeaderElementKind,
-                                                                            alignment: .top)
-            
-            let sectionFooter = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerFooterSize,
-                                                                            elementKind: MainCollectionViewController.sectionFooterElementKind,
-                                                                            alignment: .bottom)
- 
-            section.boundarySupplementaryItems = [sectionHeader, sectionFooter]
-            
-            return section
-        }
-        
-        super.init(collectionViewLayout: layout)
-        
-        self.viewModel = viewModel
-        
-        
+    fileprivate func setupViewModel() {
         self.viewModel.filesDidChangedHandler = { [weak self] in
             self?.applySnapshot()
-//            self?.footerView?.activityIndicator.stopAnimating()
-//            self?.footerView?.photosNumberLabel.isHidden = false
             self?.isUpdating = false
             self?.isPaging = false
         }
+        
+        self.viewModel.fileGetImage = { [weak self] file in
+            self?.updateSnapshot(with: file)
+        }
+    }
+    
+    init(viewModel: ViewModelProtocol = DIContainer.shared.resolve(type: MainViewModel.self)) {
+        super.init(collectionViewLayout: setuplayout())
+        
+        self.viewModel = viewModel
+        
+        setupViewModel()
     }
     
     required init?(coder: NSCoder) {
@@ -94,7 +79,7 @@ class MainCollectionViewController: UICollectionViewController {
                 
         collectionView.refreshControl = UIRefreshControl()
         
-        setupNavigatioBar()
+//        setupNavigatioBar()
         
         applySnapshot()
                             
@@ -106,82 +91,33 @@ class MainCollectionViewController: UICollectionViewController {
             isUpdating = true
             isPaging = true
             viewModel.isPaginating = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) { [self] in
-                print(viewModel.files.count)
-                viewModel.prepareFiles()
-            }
+            viewModel.prepareFiles()
         }
-        
-//        print(viewModel.files.count)
-//        if !viewModel.isPaginating && !isUpdating && !isPaging {
-//            isUpdating = true
-//            isPaging = true
-//            viewModel.prepareFiles()
-//        }
-        
     }
     
-    func setupNavigatioBar() {
-        title = "Мои файлы"
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont(name: "Montserrat-Bold", size: 24)!]
-        navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedString.Key.font: UIFont(name: "Montserrat-Bold", size: 36)!]
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.barTintColor = .white
-        
-        
-//        let leftButton = UIButton()
-//        leftButton.setImage(UIImage(systemName: "chevron.left", withConfiguration: nil), for: .normal)
-//        leftButton.setTitle("кнопка", for: .normal)
-//        leftButton.setTitleColor(.black, for: .normal)
-//        leftButton.backgroundColor = .red
-//        leftButton.heightAnchor.constraint(equalToConstant: (navigationController?.navigationBar.bounds.height)!).isActive = true
-//        leftButton.widthAnchor.constraint(equalToConstant: view.frame.width).isActive = true
-//        view.addSubview(leftButton)
-//        leftButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-//        leftButton.translatesAutoresizingMaskIntoConstraints = false
-//
-////        let leftItem = UIBarButtonItem(customView: leftButton)
-////        navigationItem.leftBarButtonItem = leftItem
-//
-//        navigationItem.titleView = leftButton
-    }
-    
-//    override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-//        let offsetY = scrollView.contentOffset.y
-//        let height = scrollView.contentSize.height
-//
-////        print("scrollView.contentOffset.y", offsetY)
-////        print("scrollView.contentSize.height", height)
-////        print("scrollView.frame.size.height", scrollView.frame.size.height, "\n\n\n")
-//
-//        if offsetY + 300 > height - scrollView.frame.size.height {
-//            print("CALL API")
-//            isUpdating = true
-//
-//            prepareFiles()
-//        }
+//    func setupNavigatioBar() {
+//        title = "Мои файлы"
+//        navigationController?.navigationBar.prefersLargeTitles = true
+//        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont(name: "Montserrat-Bold", size: 24)!]
+//        navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedString.Key.font: UIFont(name: "Montserrat-Bold", size: 36)!]
+//        navigationController?.navigationBar.shadowImage = UIImage()
+//        navigationController?.navigationBar.barTintColor = .white
 //    }
     
-    
-    // Вызывается при инерционном скроле, pull to refresh
+    // pull to refresh
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offsetY = scrollView.contentOffset.y
         let height = scrollView.contentSize.height
 
         if offsetY > height - scrollView.frame.size.height && !isPaging && height != 0 && !viewModel.isPaginating {
-
-            print("\nPULL TO REFRESH")
             prepareFiles()
         }
     }
     
-    
+    // refresh at the end
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         if indexPath.row == viewModel.files.count - 1 && viewModel.files.count != 0 {
-            print("viewModelFilesCount", viewModel.files.count)
             if !isPaging && !viewModel.isPaginating && !isUpdating {
-                print("\nEND OF LIST => CALL API")
                 prepareFiles()
             }
         }
@@ -197,14 +133,15 @@ extension MainCollectionViewController {
         let dataSource = DataSource(collectionView: collectionView) { (collectionView, indexPath, file) -> UICollectionViewCell? in
             
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "reuseId", for: indexPath) as! MainCollectionViewCell
-            cell.configureWithFile(file: file)
+            
+            cell.configure(file: file)
             
             return cell
         }
         
         let headerRegistration = UICollectionView.SupplementaryRegistration<TitleSupplementaryView> (elementKind: MainCollectionViewController.sectionHeaderElementKind) { (supplementaryView, elementKind, indexPath) in
             
-            supplementaryView.sectionName.text = "Изображения"
+            supplementaryView.sectionName.text = "Мои файлы"
         }
         
         let footerRegistration = UICollectionView.SupplementaryRegistration<FooterSupplementaryView> (elementKind: MainCollectionViewController.sectionFooterElementKind) {
@@ -229,16 +166,81 @@ extension MainCollectionViewController {
         
         return dataSource
     }
+    
+    //MARK: - Navigation
+    
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let cell = collectionView.cellForItem(at: indexPath) as! CollectionViewCellWithImageView
+        selectedCellImageView = cell.imageView
+        selectedCellImageRect = cell.imageView.convert(cell.imageView.frame, to: view)
+        
+//        DIContainer.shared.register(type: DetailViewModel.self,
+//                                    component: DetailViewModel(file: viewModel.files[indexPath.row]))
+        
+//        let detail = DetailView(file: viewModel.files[indexPath.row])
+        let vm = DetailViewModel(file: viewModel.files[indexPath.row])
+        let detail = DetailView(viewModel: vm)
+        detail.modalPresentationStyle = .custom
+        detail.transitioningDelegate = transitionDelegate
+        present(detail, animated: true, completion: nil)
+    }
+    
 }
 
 // MARK: - Snaphsot
 
 extension MainCollectionViewController {
     
-    func applySnapshot() {
+    private func applySnapshot() {
         var snapshot = Snapshot()
         snapshot.appendSections([0])
         snapshot.appendItems(viewModel.files, toSection: 0)
         dataSource.apply(snapshot, animatingDifferences: true)
     }
+    
+    private func updateSnapshot(with file: File) {
+        var updatedSnapshot = dataSource.snapshot()
+        
+        if let datasourceIndex = updatedSnapshot.indexOfItem(file) {
+            let item = self.viewModel.files[datasourceIndex]
+            updatedSnapshot.reloadItems([item])
+            self.dataSource.apply(updatedSnapshot, animatingDifferences: false)
+        }
+    }
 }
+
+// MARK: - Layout
+
+fileprivate func setuplayout() -> UICollectionViewCompositionalLayout {
+   let layout =  UICollectionViewCompositionalLayout { (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
+        let item = NSCollectionLayoutItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5),
+                                                                             heightDimension: .fractionalHeight(1.0)))
+        item.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 5, bottom: 5, trailing: 5)
+        
+        let groupSize = NSCollectionLayoutSize(widthDimension: NSCollectionLayoutDimension.fractionalWidth(1.0),
+                                               heightDimension: NSCollectionLayoutDimension.fractionalWidth(0.65))
+        
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitem: item, count: 2)
+        group.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5)
+        
+        let section = NSCollectionLayoutSection(group: group)
+        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 20, trailing: 0)
+        
+        let headerFooterSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                                     heightDimension: .estimated(44))
+        
+        let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerFooterSize,
+                                                                        elementKind: MainCollectionViewController.sectionHeaderElementKind,
+                                                                        alignment: .top)
+        
+        let sectionFooter = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerFooterSize,
+                                                                        elementKind: MainCollectionViewController.sectionFooterElementKind,
+                                                                        alignment: .bottom)
+
+        section.boundarySupplementaryItems = [sectionHeader, sectionFooter]
+        
+        return section
+    }
+    return layout
+}
+

@@ -6,28 +6,25 @@
 //
 
 import Foundation
-import UIKit
 
 protocol ViewModelProtocol {
     
     var files: [File] { get set }
+    
     var filesDidChangedHandler: (() -> Void)? { get set }
+    
+    var fileGetImage: ((File) -> Void)? { get set }
+    
     var isPaginating: Bool { get set }
     
     func prepareFiles()
-    
-    func presentAuthViewController()
 }
 
 class MainViewModel: ViewModelProtocol {
     
-    var navigationController: UINavigationController?
-    
-    init(navController: UINavigationController) {
-        self.navigationController = navController
-    }
-    
     var filesDidChangedHandler: (() -> Void)?
+    
+    var fileGetImage: ((File) -> Void)?
     
     var files: [File] = [] {
         didSet {            
@@ -35,55 +32,58 @@ class MainViewModel: ViewModelProtocol {
         }
     }
     
-    
-//    var offset: Int {
-//        return files.count
-//    }
-    
-    var offset = 0
-    
+    var offset: Int {
+        return files.count
+    }
+        
     var isPaginating = false
     
     func prepareFiles() {
         isPaginating = true
         ApiManager.shared.fetchFiles(offset: offset) { (response) in
             guard let items = response.items else { return }
-            let startCount = self.files.count
-            print("START COUNT", self.files.count)
-            print("КОЛИЧЕСТВО ПРИШЕДШИХ items", items.count)
+            var newFiles = [File]()
             for item in items {
-                if let preview = item.preview {
-                    ApiManager.shared.loadImage(url: preview) { (image) in
-                        let file = File(image: image, name: item.name!, size: String(item.size!))
-                        self.files.append(file)
+                
+                let file = File(previewUrl: URL(string: item.preview ?? "") ?? nil, name: item.name!, size: String(item.size!), path: item.path)
+                
+                let url = item.preview
+                let path = item.path
+
+                if url != nil {
+                    let nsUrl = NSURL(string: url!)
+
+                    // Fetch previews
+                    ImageCache.shared.load(nsUrl: nsUrl, file: file) { (fetchedFile, image) in
+                        if let img = image, img != fetchedFile.preview {
+                            file.preview = image
+                            file.fileGetImage?()
+                            
+                            guard let fileBind = self.fileGetImage else { return }
+                            fileBind(file)
+                        }
                     }
-                } else {
-                    let file = File(image: nil, name: item.name!, size: String(item.size!))
-                    self.files.append(file)
+
+                    // Fetch full images
+                    ApiManager.shared.getUrlForDownloadingImage(path: path) { (url) in
+                        file.imageUrl = URL(string: url!)
+
+                        ImageCache.shared.load(nsUrl: file.imageUrl! as NSURL, file: file) { (fetchedFile, image) in
+                            if let img = image, img != fetchedFile.image {
+                                file.image = image
+                                file.fileGetImage?()
+
+                                guard let fileBind = self.fileGetImage else { return }
+                                fileBind(file)
+                            }
+                        }
+                    }
                 }
+                newFiles.append(file)
             }
-            let newFiles = [File]()
-            self.files.append(contentsOf: newFiles)
-            print(self.files.count - startCount, "ФАЙЛОВ БЫЛО ДОБАВЛЕНО")
             
-            self.offset += items.count
-            print("offset", self.offset)
+            self.files.append(contentsOf: newFiles)
             self.isPaginating = false
         }
-    }
-}
-
-extension MainViewModel: AuthViewControllerDelegate {
-    
-    func handleTokenChanged() {
-        prepareFiles()
-    }
-    
-    func presentAuthViewController() {
-        let requsetTokenViewController = AuthViewController()
-        requsetTokenViewController.delegate = self
-        requsetTokenViewController.modalPresentationStyle = .fullScreen
-        navigationController?.present(requsetTokenViewController, animated: false, completion: nil)
-        return
     }
 }

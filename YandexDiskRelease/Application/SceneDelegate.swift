@@ -16,25 +16,24 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(frame: windowScene.coordinateSpace.bounds)
         window?.windowScene = windowScene
-        
-        let navController = UINavigationController()
-        
+                
         // setup container
         
         let container = DIContainer.shared
-        container.register(type: MainViewModel.self, component: MainViewModel(navController: navController))
+        container.register(type: MainViewModel.self, component: MainViewModel())
         
         // setup root view controller
         
         let rootVC = MainCollectionViewController()
-        navController.viewControllers.append(rootVC)
+//        navController.viewControllers.append(rootVC)
         
-        window?.rootViewController = navController
+//        window?.rootViewController = navController
+        window?.rootViewController = rootVC
         window?.makeKeyAndVisible()
         
         if (UserDefaults.standard.value(forKey: "Token") == nil) {
             print("we dont have token")
-            rootVC.viewModel.presentAuthViewController()
+            rootVC.presentAuthViewController()
         }
     }
 

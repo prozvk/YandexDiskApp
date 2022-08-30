@@ -15,7 +15,7 @@ class TitleSupplementaryView: UICollectionReusableView {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.adjustsFontForContentSizeCategory = true
-        label.font = UIFont(name: "Montserrat-Bold", size: 22)
+        label.font = UIFont(name: "Montserrat-Bold", size: 36)
         return label
     }()
     
@@ -52,7 +52,7 @@ extension TitleSupplementaryView {
             allButton.topAnchor.constraint(equalTo: topAnchor, constant: inset),
             allButton.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -inset),
             
-            sectionName.leadingAnchor.constraint(equalTo: leadingAnchor, constant: inset * 2),
+            sectionName.leadingAnchor.constraint(equalTo: leadingAnchor, constant: inset),
             sectionName.trailingAnchor.constraint(equalTo: allButton.leadingAnchor, constant: -inset),
             sectionName.topAnchor.constraint(equalTo: topAnchor, constant: inset),
             sectionName.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -inset)

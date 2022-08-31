@@ -20,7 +20,6 @@ class MainCollectionViewCell: UICollectionViewCell, CollectionViewCellWithImageV
         image.tintColor = #colorLiteral(red: 0.4861351612, green: 0.4896013709, blue: 0.5, alpha: 1)
         image.backgroundColor = .systemGroupedBackground
         image.contentMode = .scaleAspectFill
-        //image.contentMode = .center
         image.layer.cornerRadius = 25
         image.layer.masksToBounds = true
         image.clipsToBounds = true

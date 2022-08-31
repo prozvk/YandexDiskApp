@@ -8,7 +8,6 @@
 import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
-    
 
     var window: UIWindow?
 
@@ -16,18 +15,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(frame: windowScene.coordinateSpace.bounds)
         window?.windowScene = windowScene
-                
-        // setup container
         
         let container = DIContainer.shared
         container.register(type: MainViewModel.self, component: MainViewModel())
-        
-        // setup root view controller
-        
+                
         let rootVC = MainCollectionViewController()
-//        navController.viewControllers.append(rootVC)
         
-//        window?.rootViewController = navController
         window?.rootViewController = rootVC
         window?.makeKeyAndVisible()
         

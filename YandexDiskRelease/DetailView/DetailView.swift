@@ -8,10 +8,8 @@
 import UIKit
 
 class DetailView: UIViewController {
-    
-//    var file: File
-    
-    var viewModel: DetailViewModelProtocol?
+        
+    weak var viewModel: DetailViewModelProtocol?
         
     lazy var imageView: UIImageView = {
         let image = UIImageView()
@@ -43,9 +41,18 @@ class DetailView: UIViewController {
     }()
     
     init(viewModel: DetailViewModelProtocol = DIContainer.shared.resolve(type: DetailViewModel.self)) {
-        
-        super.init(nibName: nil, bundle: nil)
         self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        view.backgroundColor = .white
+        
+        setupLayout()
+        
+        fillUI()
     }
 
     fileprivate func setupLayout() {        
@@ -70,48 +77,19 @@ class DetailView: UIViewController {
         ])
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        view.backgroundColor = .white
-        
-        setupLayout()
-        
-        fillUI()
-    }
-    
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//
-//        if file.image == nil {
-//            imageView.image = file.preview ?? file.defaultImage
-//            file.fileGetImage = { [weak self] in
-//                self?.imageView.image = self?.file.image
-//            }
-//        } else {
-//            imageView.image = file.image
-//        }
-//    }
-//
-//    init(file: File) {
-//        self.file = file
-//        super.init(nibName: nil, bundle: nil)
-//    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    fileprivate func fillUI() {
+        viewModel!.imageBind = { image in
+            self.imageView.image = image
+        }
     }
     
     @objc func dismissSelf() {
-    
-        //UIImageWriteToSavedPhotosAlbum(image(), self, nil, nil)
-        
         dismiss(animated: true, completion: nil)
     }
     
     @objc func saveImage() {
-        print("Save")
-        view.layoutIfNeeded()
+        viewModel?.writeToPhotos(image: imageView.image!)
+        
         UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut) {
             self.saveButton.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
         } completion: { _ in
@@ -121,9 +99,7 @@ class DetailView: UIViewController {
         }
     }
     
-    func fillUI() {
-        viewModel!.imageBind = { image in
-            self.imageView.image = image
-        }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

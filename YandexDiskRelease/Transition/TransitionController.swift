@@ -9,17 +9,13 @@ import UIKit
 import Foundation
 
 class TransitionController: NSObject, UIViewControllerTransitioningDelegate {
-    
-    static let shared = TransitionController()
-    
+        
     private let driver = TransitionDriver()
-    
-    private override init() {}
     
     //MARK: - PresentationController
     
     func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
-        driver.link(to: presented)
+        driver.addGesture(to: presented)
         
         return BackgroundViewPresentationController(presentedViewController: presented, presenting: presenting ?? source)
     }
@@ -46,6 +42,5 @@ class TransitionController: NSObject, UIViewControllerTransitioningDelegate {
         } else {
             return nil
         }
-        
     }
 }

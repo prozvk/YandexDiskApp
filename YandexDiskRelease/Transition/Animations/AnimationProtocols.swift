@@ -16,7 +16,7 @@ protocol MainViewAnimationDelegate: class {
     func transitionViewFrame() -> CGRect
 }
 
-protocol DetailViewControllerDelegate: MainViewAnimationDelegate {
+protocol DetailViewAnimationDelegate: MainViewAnimationDelegate {
     
     var view: UIView! { get set }
     

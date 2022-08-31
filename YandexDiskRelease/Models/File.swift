@@ -15,7 +15,7 @@ class File: Hashable {
     var size: String
     var path: String
     
-    let defaultImage = UIImage(systemName: "doc.text")
+    let defaultImage = UIImage(systemName: "doc.text")!
     
     var preview: UIImage?
     var previewUrl: URL?

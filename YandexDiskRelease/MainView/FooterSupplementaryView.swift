@@ -24,7 +24,6 @@ class FooterSupplementaryView: UICollectionReusableView {
         let actInd = UIActivityIndicatorView()
         actInd.translatesAutoresizingMaskIntoConstraints = false
         actInd.hidesWhenStopped = true
-        //actInd.startAnimating()
         return actInd
     }()
 

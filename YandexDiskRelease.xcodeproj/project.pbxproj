@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		B6278A0F28B7659E002329AF /* DismissAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6278A0E28B7659E002329AF /* DismissAnimation.swift */; };
 		B6278A1428B76A90002329AF /* BackgroundViewPresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6278A1328B76A90002329AF /* BackgroundViewPresentationController.swift */; };
-		B6278A1728B786CD002329AF /* MainViewAnimationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6278A1628B786CD002329AF /* MainViewAnimationDelegate.swift */; };
+		B6278A1728B786CD002329AF /* AnimationProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6278A1628B786CD002329AF /* AnimationProtocols.swift */; };
 		B6278A1A28B78732002329AF /* AnimationDelegate + MainCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6278A1928B78732002329AF /* AnimationDelegate + MainCollectionViewController.swift */; };
 		B6278A1D28B91E15002329AF /* TransitionDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6278A1C28B91E15002329AF /* TransitionDriver.swift */; };
 		B6278A2028BCCBC7002329AF /* DetailViewControllerDelegate + DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6278A1F28BCCBC7002329AF /* DetailViewControllerDelegate + DetailViewController.swift */; };
@@ -28,6 +28,7 @@
 		B64991FD2889807D000BC40D /* Montserrat-VariableFont_wght.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B64991FC2889807D000BC40D /* Montserrat-VariableFont_wght.ttf */; };
 		B64992032889995E000BC40D /* Montserrat-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B64992022889995E000BC40D /* Montserrat-Bold.ttf */; };
 		B64992072889A18A000BC40D /* Montserrat-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B64992062889A18A000BC40D /* Montserrat-Light.ttf */; };
+		B65FE2C628BF8F5C00129674 /* UIImage + Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65FE2C528BF8F5C00129674 /* UIImage + Extension.swift */; };
 		B667309928B50E4B00D24185 /* AuthDelegate + MainCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B667309828B50E4B00D24185 /* AuthDelegate + MainCollectionViewController.swift */; };
 		B6A87509288FCE38007CFBA1 /* FooterSupplementaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A87508288FCE38007CFBA1 /* FooterSupplementaryView.swift */; };
 		B6CEB73728B28D1C00260B8C /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CEB73628B28D1C00260B8C /* DetailView.swift */; };
@@ -44,7 +45,7 @@
 /* Begin PBXFileReference section */
 		B6278A0E28B7659E002329AF /* DismissAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DismissAnimation.swift; sourceTree = "<group>"; };
 		B6278A1328B76A90002329AF /* BackgroundViewPresentationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundViewPresentationController.swift; sourceTree = "<group>"; };
-		B6278A1628B786CD002329AF /* MainViewAnimationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewAnimationDelegate.swift; sourceTree = "<group>"; };
+		B6278A1628B786CD002329AF /* AnimationProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationProtocols.swift; sourceTree = "<group>"; };
 		B6278A1928B78732002329AF /* AnimationDelegate + MainCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AnimationDelegate + MainCollectionViewController.swift"; sourceTree = "<group>"; };
 		B6278A1C28B91E15002329AF /* TransitionDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionDriver.swift; sourceTree = "<group>"; };
 		B6278A1F28BCCBC7002329AF /* DetailViewControllerDelegate + DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DetailViewControllerDelegate + DetailViewController.swift"; sourceTree = "<group>"; };
@@ -65,6 +66,7 @@
 		B64991FC2889807D000BC40D /* Montserrat-VariableFont_wght.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Montserrat-VariableFont_wght.ttf"; sourceTree = "<group>"; };
 		B64992022889995E000BC40D /* Montserrat-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Montserrat-Bold.ttf"; path = "../../../../Downloads/montserrat/static/Montserrat-Bold.ttf"; sourceTree = "<group>"; };
 		B64992062889A18A000BC40D /* Montserrat-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Montserrat-Light.ttf"; sourceTree = "<group>"; };
+		B65FE2C528BF8F5C00129674 /* UIImage + Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage + Extension.swift"; sourceTree = "<group>"; };
 		B667309828B50E4B00D24185 /* AuthDelegate + MainCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AuthDelegate + MainCollectionViewController.swift"; sourceTree = "<group>"; };
 		B6A87508288FCE38007CFBA1 /* FooterSupplementaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FooterSupplementaryView.swift; sourceTree = "<group>"; };
 		B6CEB73628B28D1C00260B8C /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
@@ -109,6 +111,7 @@
 		B648C20F2887098D00F5B342 /* YandexDiskRelease */ = {
 			isa = PBXGroup;
 			children = (
+				B65FE2C428BF8F1A00129674 /* Extensions */,
 				B667309B28B51FEB00D24185 /* Transition */,
 				B648C22F288710FF00F5B342 /* Services */,
 				B648C22B2887104300F5B342 /* AuthManager */,
@@ -185,6 +188,14 @@
 			path = MainView;
 			sourceTree = "<group>";
 		};
+		B65FE2C428BF8F1A00129674 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				B65FE2C528BF8F5C00129674 /* UIImage + Extension.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		B667309B28B51FEB00D24185 /* Transition */ = {
 			isa = PBXGroup;
 			children = (
@@ -210,7 +221,7 @@
 			children = (
 				B6E58E3E28B61F5F00A9243F /* PresentAnimation.swift */,
 				B6278A0E28B7659E002329AF /* DismissAnimation.swift */,
-				B6278A1628B786CD002329AF /* MainViewAnimationDelegate.swift */,
+				B6278A1628B786CD002329AF /* AnimationProtocols.swift */,
 			);
 			path = Animations;
 			sourceTree = "<group>";
@@ -330,13 +341,14 @@
 				B644C3C72887EBA90007F6E2 /* File.swift in Sources */,
 				B648C2112887098D00F5B342 /* AppDelegate.swift in Sources */,
 				B6E58E3C28B61CA400A9243F /* PresentationController.swift in Sources */,
-				B6278A1728B786CD002329AF /* MainViewAnimationDelegate.swift in Sources */,
+				B6278A1728B786CD002329AF /* AnimationProtocols.swift in Sources */,
 				B648C22D2887105500F5B342 /* AuthViewController.swift in Sources */,
 				B648C2132887098D00F5B342 /* SceneDelegate.swift in Sources */,
 				B6E58E3F28B61F5F00A9243F /* PresentAnimation.swift in Sources */,
 				B6278A1428B76A90002329AF /* BackgroundViewPresentationController.swift in Sources */,
 				B648C22928870F1B00F5B342 /* DiskResponse.swift in Sources */,
 				B64991F82888680C000BC40D /* MainViewModel.swift in Sources */,
+				B65FE2C628BF8F5C00129674 /* UIImage + Extension.swift in Sources */,
 				B6278A2328BD2058002329AF /* ImageSaver.swift in Sources */,
 				B6CEB73A28B28D2B00260B8C /* DetailViewModel.swift in Sources */,
 				B6A87509288FCE38007CFBA1 /* FooterSupplementaryView.swift in Sources */,

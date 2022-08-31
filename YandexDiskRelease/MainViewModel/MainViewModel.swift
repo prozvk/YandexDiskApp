@@ -10,25 +10,22 @@ import Foundation
 protocol ViewModelProtocol {
     
     var files: [File] { get set }
-    
-    var filesDidChangedHandler: (() -> Void)? { get set }
-    
+    var filesDidChangedHandler: ((Int) -> Void)? { get set }
     var fileGetImage: ((File) -> Void)? { get set }
-    
+    var pagingStateChanged: ((Bool) -> ())? { get set }
     var isPaginating: Bool { get set }
-    
     func prepareFiles()
 }
 
 class MainViewModel: ViewModelProtocol {
     
-    var filesDidChangedHandler: (() -> Void)?
-    
+    var filesDidChangedHandler: ((Int) -> Void)?
     var fileGetImage: ((File) -> Void)?
+    var pagingStateChanged: ((Bool) -> ())?
     
     var files: [File] = [] {
-        didSet {            
-            filesDidChangedHandler?()
+        didSet {
+            filesDidChangedHandler?(files.count)
         }
     }
     
@@ -36,10 +33,16 @@ class MainViewModel: ViewModelProtocol {
         return files.count
     }
         
-    var isPaginating = false
+    var isPaginating = false {
+        didSet {
+            pagingStateChanged?(isPaginating)
+        }
+    }
     
     func prepareFiles() {
-        isPaginating = true
+        if isPaginating { return }
+        else { isPaginating = true }
+        
         ApiManager.shared.fetchFiles(offset: offset) { (response) in
             guard let items = response.items else { return }
             var newFiles = [File]()
@@ -65,19 +68,19 @@ class MainViewModel: ViewModelProtocol {
                     }
 
                     // Fetch full images
-                    ApiManager.shared.getUrlForDownloadingImage(path: path) { (url) in
-                        file.imageUrl = URL(string: url!)
-
-                        ImageCache.shared.load(nsUrl: file.imageUrl! as NSURL, file: file) { (fetchedFile, image) in
-                            if let img = image, img != fetchedFile.image {
-                                file.image = image
-                                file.fileGetImage?()
-
-                                guard let fileBind = self.fileGetImage else { return }
-                                fileBind(file)
-                            }
-                        }
-                    }
+//                    ApiManager.shared.getUrlForDownloadingImage(path: path) { (url) in
+//                        file.imageUrl = URL(string: url!)
+//
+//                        ImageCache.shared.load(nsUrl: file.imageUrl! as NSURL, file: file) { (fetchedFile, image) in
+//                            if let img = image, img != fetchedFile.image {
+//                                file.image = image
+//                                file.fileGetImage?()
+//
+//                                guard let fileBind = self.fileGetImage else { return }
+//                                fileBind(file)
+//                            }
+//                        }
+//                    }
                 }
                 newFiles.append(file)
             }

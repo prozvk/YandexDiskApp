@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol DetailViewModelProtocol {
+protocol DetailViewModelProtocol: class {
     
     var imageBind: ((UIImage) -> ())? { get set }
     
@@ -16,24 +16,27 @@ protocol DetailViewModelProtocol {
 
 class DetailViewModel: DetailViewModelProtocol {
     
-    func writeToPhotos(image: UIImage) {
-        
-    }
-    
     var file: File
     
-    var imageBind: ((UIImage) -> ())?
+    var imageBind: ((UIImage) -> ())? {
+        didSet {
+            imageBind!((file.image ?? file.preview) ?? file.defaultImage)
+        }
+    }
     
     init(file: File) {
         self.file = file
         
-        guard let image = file.image else {
-            imageBind?(file.preview ?? file.defaultImage!)
-            file.fileGetImage = { [weak self] in
-                self?.imageBind?(file.image!)
-            }
-            return
+        fileImageListener()
+    }
+    
+    func fileImageListener() {
+        file.fileGetImage = { [weak self] in
+            self?.imageBind?(self!.file.image!)
         }
-        imageBind?(image)
+    }
+    
+    func writeToPhotos(image: UIImage) {
+        UIImageWriteToSavedPhotosAlbum(image, self, nil, nil)
     }
 }

@@ -20,13 +20,13 @@ class PresentAnimation: NSObject, UIViewControllerAnimatedTransitioning {
         let containerView = transitionContext.containerView
         
         let fromVC = transitionContext.viewController(forKey: .from) as! MainViewAnimationDelegate
-        let toVC = transitionContext.viewController(forKey: .to) as! DetailViewControllerDelegate
+        let toVC = transitionContext.viewController(forKey: .to) as! DetailViewAnimationDelegate
         toVC.view.alpha = 0
         containerView.addSubview(toVC.view)
         
         let image = toVC.transitionImage()
 
-        let finalTransitionSize = absoluteImageFrameInPresentedView(image: image, forView: toVC.view)
+        let finalTransitionSize = image.absoluteFrameInView(forView: toVC.view)
         
         if transitionImageView == nil {
             let imageView = UIImageView(image: image)
@@ -50,25 +50,6 @@ class PresentAnimation: NSObject, UIViewControllerAnimatedTransitioning {
             self.transitionImageView = nil
             fromVC.showTranisitionView()
             transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
-        }
-    }
-    
-    /// Calculates frame of image in forView
-    private func absoluteImageFrameInPresentedView(image: UIImage, forView view: UIView) -> CGRect {
-        
-        let viewRatio = view.frame.size.width / view.frame.size.height
-        let imageRatio = image.size.width / image.size.height
-        
-        let touchesSides = (imageRatio > viewRatio)
-        
-        if touchesSides {
-            let height = view.frame.width / imageRatio
-            let yPoint = view.frame.minY + (view.frame.height - height) / 2
-            return CGRect(x: 0, y: yPoint, width: view.frame.width, height: height)
-        } else {
-            let width = view.frame.height * imageRatio
-            let xPoint = view.frame.minX + (view.frame.width - width) / 2
-            return CGRect(x: xPoint, y: 0, width: width, height: view.frame.height)
         }
     }
 }

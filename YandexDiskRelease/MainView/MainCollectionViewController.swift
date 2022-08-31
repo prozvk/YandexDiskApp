@@ -21,41 +21,10 @@ class MainCollectionViewController: UICollectionViewController {
     var footerView: FooterSupplementaryView?
     var viewModel: ViewModelProtocol!
     
-    let transitionDelegate = TransitionController.shared
+    let transitionDelegate = TransitionController()
     
     var selectedCellImageView: UIImageView!
     var selectedCellImageRect: CGRect!
-
-    //MARK: - TODO: перенести во viewModel
-    var isPaging = false
-    
-    var isUpdating: Bool = false {
-        didSet {
-            //print("did set is Updating", isUpdating)
-            if isUpdating {
-                footerView?.photosNumberLabel.isHidden = true
-                footerView?.activityIndicator.startAnimating()
-                footerView?.layoutIfNeeded()
-            } else {
-                footerView?.activityIndicator.stopAnimating()
-                footerView?.photosNumberLabel.text = "\(viewModel.files.count) файла(-ов)"
-                footerView?.photosNumberLabel.isHidden = false
-                footerView?.layoutIfNeeded()
-            }
-        }
-    }
-        
-    fileprivate func setupViewModel() {
-        self.viewModel.filesDidChangedHandler = { [weak self] in
-            self?.applySnapshot()
-            self?.isUpdating = false
-            self?.isPaging = false
-        }
-        
-        self.viewModel.fileGetImage = { [weak self] file in
-            self?.updateSnapshot(with: file)
-        }
-    }
     
     init(viewModel: ViewModelProtocol = DIContainer.shared.resolve(type: MainViewModel.self)) {
         super.init(collectionViewLayout: setuplayout())
@@ -86,13 +55,25 @@ class MainCollectionViewController: UICollectionViewController {
         prepareFiles()
     }
     
-    func prepareFiles() {
-        if !viewModel.isPaginating && !isUpdating && !isPaging {
-            isUpdating = true
-            isPaging = true
-            viewModel.isPaginating = true
-            viewModel.prepareFiles()
+    fileprivate func setupViewModel() {
+        self.viewModel.filesDidChangedHandler = { [weak self] count in
+            self?.applySnapshot()
+            self?.footerView?.photosNumberLabel.text = "\(count) файла(-ов)"
         }
+        
+        self.viewModel.fileGetImage = { [weak self] file in
+            self?.updateSnapshot(with: file)
+        }
+        
+        self.viewModel.pagingStateChanged = { [weak self] isPaging in
+            self?.footerView?.photosNumberLabel.isHidden = isPaging
+            let ai = self?.footerView?.activityIndicator
+            isPaging ? ai?.startAnimating() : ai?.stopAnimating()
+        }
+    }
+    
+    func prepareFiles() {
+        viewModel.prepareFiles()
     }
     
 //    func setupNavigatioBar() {
@@ -109,7 +90,7 @@ class MainCollectionViewController: UICollectionViewController {
         let offsetY = scrollView.contentOffset.y
         let height = scrollView.contentSize.height
 
-        if offsetY > height - scrollView.frame.size.height && !isPaging && height != 0 && !viewModel.isPaginating {
+        if offsetY > height - scrollView.frame.size.height && height != 0 {
             prepareFiles()
         }
     }
@@ -117,9 +98,7 @@ class MainCollectionViewController: UICollectionViewController {
     // refresh at the end
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         if indexPath.row == viewModel.files.count - 1 && viewModel.files.count != 0 {
-            if !isPaging && !viewModel.isPaginating && !isUpdating {
-                prepareFiles()
-            }
+            prepareFiles()
         }
     }
 }
@@ -174,17 +153,14 @@ extension MainCollectionViewController {
         selectedCellImageView = cell.imageView
         selectedCellImageRect = cell.imageView.convert(cell.imageView.frame, to: view)
         
-//        DIContainer.shared.register(type: DetailViewModel.self,
-//                                    component: DetailViewModel(file: viewModel.files[indexPath.row]))
+        DIContainer.shared.register(type: DetailViewModel.self,
+                                    component: DetailViewModel(file: viewModel.files[indexPath.row]))
         
-//        let detail = DetailView(file: viewModel.files[indexPath.row])
-        let vm = DetailViewModel(file: viewModel.files[indexPath.row])
-        let detail = DetailView(viewModel: vm)
+        let detail = DetailView()
         detail.modalPresentationStyle = .custom
         detail.transitioningDelegate = transitionDelegate
         present(detail, animated: true, completion: nil)
     }
-    
 }
 
 // MARK: - Snaphsot

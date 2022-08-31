@@ -21,9 +21,9 @@ class TransitionDriver: NSObject, UIViewControllerInteractiveTransitioning {
     private var transitionContext: UIViewControllerContextTransitioning?
     
     private var toVC: MainViewAnimationDelegate?
-    private var fromVC: DetailViewControllerDelegate?
+    private var fromVC: DetailViewAnimationDelegate?
         
-    func link(to contoller: UIViewController) {
+    func addGesture(to contoller: UIViewController) {
         presentedController = contoller
         
         panRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handleDismiss(gestureRecognizer:)))
@@ -102,7 +102,7 @@ class TransitionDriver: NSObject, UIViewControllerInteractiveTransitioning {
     func startInteractiveTransition(_ transitionContext: UIViewControllerContextTransitioning) {
         self.transitionContext = transitionContext
         
-        fromVC = transitionContext.viewController(forKey: .from) as? DetailViewControllerDelegate
+        fromVC = transitionContext.viewController(forKey: .from) as? DetailViewAnimationDelegate
         toVC = transitionContext.viewController(forKey: .to) as? MainViewAnimationDelegate
         
         transitionImage = fromVC!.transitionImage()

@@ -13,7 +13,7 @@ protocol ViewModelProtocol {
     var filesDidChangedHandler: ((Int) -> Void)? { get set }
     var fileGetImage: ((File) -> Void)? { get set }
     var pagingStateChanged: ((Bool) -> ())? { get set }
-    var isPaginating: Bool { get set }
+    var isPaginating: Bool { get }
     func prepareFiles()
 }
 
@@ -40,11 +40,16 @@ class MainViewModel: ViewModelProtocol {
     }
     
     func prepareFiles() {
+        print(isPaginating)
         if isPaginating { return }
         else { isPaginating = true }
+        print("we are preparing files")
         
         ApiManager.shared.fetchFiles(offset: offset) { (response) in
-            guard let items = response.items else { return }
+            guard let response = response, let items = response.items else {
+                self.isPaginating = false
+                return
+            }
             var newFiles = [File]()
             for item in items {
                 

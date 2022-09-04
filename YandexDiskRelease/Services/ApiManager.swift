@@ -18,14 +18,17 @@ class ApiManager {
         return (UserDefaults.standard.value(forKey: "Token") as? String) ?? nil
     }
         
-    func fetchFiles(offset: Int, completion: @escaping (DiskResponse) -> Void) {
+    func fetchFiles(offset: Int, completion: @escaping (DiskResponse?) -> Void) {
         
         var components = URLComponents(string: "https://cloud-api.yandex.net/v1/disk/resources/files")
         //components?.queryItems = [URLQueryItem(name: "media_type", value: "image")]
         
         components?.queryItems = [URLQueryItem(name: "limit", value: "20"), URLQueryItem(name: "offset", value: "\(offset)")]
         
-        guard let url = components?.url, (token != nil) else { return }
+        guard let url = components?.url, (token != nil) else {
+            completion(nil)
+            return
+        }
         
         var request = URLRequest(url: url)
         request.setValue("OAuth \(token!)", forHTTPHeaderField: "Authorization")

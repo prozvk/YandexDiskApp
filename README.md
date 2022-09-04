@@ -1,4 +1,1 @@
 # YandexDiskApp
-
-![LoginScreen!](LoginScreen.png)
-

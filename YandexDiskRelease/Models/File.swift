@@ -10,7 +10,7 @@ import UIKit
 
 class File: Hashable {
     
-    var id: String = UUID().uuidString
+    var id = UUID()
     var name: String
     var size: String
     var path: String

@@ -77,14 +77,12 @@ class MainCollectionViewCell: UICollectionViewCell, CollectionViewCellWithImageV
         nameLabel.text = file.name
         sizeLabel.text = file.size
         imageView.contentMode = .scaleAspectFill
-        if file.image != nil {
-            imageView.image = file.image
-        } else if file.preview != nil {
-            imageView.image = file.preview
-        } else {
+        guard let image = file.image ?? file.preview else {
             imageView.contentMode = .center
-            imageView.image = UIImage(systemName: "doc.text")
+            imageView.image = file.defaultImage
+            return
         }
+        imageView.image = image
     }
     
     override func prepareForReuse() {

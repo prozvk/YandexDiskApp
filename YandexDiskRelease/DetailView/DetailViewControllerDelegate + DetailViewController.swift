@@ -9,6 +9,13 @@ import UIKit
 
 extension DetailView: DetailViewAnimationDelegate {
     
+    func saveButtonView() -> UIView {
+        let view = saveButton.snapshotView(afterScreenUpdates: true)!
+        view.frame = saveButton.frame
+        saveButton.isHidden = true
+        return view
+    }
+    
     func hideTransitionView() {
         imageView.isHidden = true
     }

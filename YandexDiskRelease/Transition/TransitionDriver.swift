@@ -80,17 +80,17 @@ class TransitionDriver: NSObject, UIViewControllerInteractiveTransitioning {
     
     func endInteractiveTransition(gestureRecognizer: UIPanGestureRecognizer) {
         
-        let velocity = gestureRecognizer.velocity(in: fromVC!.view)
+        let velocity = gestureRecognizer.velocity(in: fromVC?.view)
          
         let shouldComplete = velocity.y >= 0 || transitionImageView!.center.y >= fromImageViewFrame!.midY
         
         UIView.animate(withDuration: 0.35, delay: 0, usingSpringWithDamping: 0.75, initialSpringVelocity: 0, options: [UIView.AnimationOptions.transitionCrossDissolve]) {
-            self.fromVC!.view.alpha = shouldComplete ? 0 : 1
+            self.fromVC?.view.alpha = shouldComplete ? 0 : 1
             self.transitionImageView?.frame = shouldComplete ? self.toImageViewFrame! : self.fromImageViewFrame!
             self.transitionImageView?.layer.cornerRadius = shouldComplete ? 25 : 0
         } completion: { _ in
             self.toVC!.showTranisitionView()
-            self.fromVC!.showTranisitionView()
+            self.fromVC?.showTranisitionView()
             self.transitionImageView?.removeFromSuperview()
             self.transitionImageView = nil
             self.wantsInteractiveStart = false
@@ -105,9 +105,9 @@ class TransitionDriver: NSObject, UIViewControllerInteractiveTransitioning {
         fromVC = transitionContext.viewController(forKey: .from) as? DetailViewAnimationDelegate
         toVC = transitionContext.viewController(forKey: .to) as? MainViewAnimationDelegate
         
-        transitionImage = fromVC!.transitionImage()
+        transitionImage = fromVC?.transitionImage()
         
-        fromImageViewFrame = fromVC!.transitionViewFrame()
+        fromImageViewFrame = fromVC?.transitionViewFrame()
         
         toImageViewFrame = toVC!.transitionViewFrame()
                             

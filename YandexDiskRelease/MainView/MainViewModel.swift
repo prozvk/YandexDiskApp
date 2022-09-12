@@ -73,19 +73,19 @@ class MainViewModel: ViewModelProtocol {
                     }
 
                     // Fetch full images
-//                    ApiManager.shared.getUrlForDownloadingImage(path: path) { (url) in
-//                        file.imageUrl = URL(string: url!)
-//
-//                        ImageCache.shared.load(nsUrl: file.imageUrl! as NSURL, file: file) { (fetchedFile, image) in
-//                            if let img = image, img != fetchedFile.image {
-//                                file.image = image
-//                                file.fileGetImage?()
-//
-//                                guard let fileBind = self.fileGetImage else { return }
-//                                fileBind(file)
-//                            }
-//                        }
-//                    }
+                    ApiManager.shared.getUrlForDownloadingImage(path: path) { (url) in
+                        file.imageUrl = URL(string: url!)
+
+                        ImageCache.shared.load(nsUrl: file.imageUrl! as NSURL, file: file) { (fetchedFile, image) in
+                            if let img = image, img != fetchedFile.image {
+                                file.image = image
+                                file.fileGetImage?()
+
+                                guard let fileBind = self.fileGetImage else { return }
+                                fileBind(file)
+                            }
+                        }
+                    }
                 }
                 newFiles.append(file)
             }

@@ -21,4 +21,6 @@ protocol DetailViewAnimationDelegate: MainViewAnimationDelegate {
     var view: UIView! { get set }
     
     func transitionImage() -> UIImage
+    
+    func saveButtonView() -> UIView
 }

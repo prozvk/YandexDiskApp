@@ -55,6 +55,19 @@ class DetailView: UIViewController {
         fillUI()
     }
 
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        saveButton.frame = saveButton.frame.offsetBy(dx: 0, dy: 100)
+        dismissButton.frame = dismissButton.frame.offsetBy(dx: 0, dy: -100)
+        
+        UIView.animate(withDuration: 0.25) { [self] in
+            saveButton.frame = saveButton.frame.offsetBy(dx: 0, dy: -100)
+            dismissButton.frame = dismissButton.frame.offsetBy(dx: 0, dy: 100)
+        }
+    }
+
     fileprivate func setupLayout() {        
         view.addSubview(imageView)
         view.addSubview(dismissButton)
